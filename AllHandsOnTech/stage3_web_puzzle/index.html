@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Stage 3 — Web Puzzle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 2rem; }
+      .card { max-width: 760px; margin: 0 auto; padding: 1.5rem; border: 1px solid #ccc; border-radius: 12px; }
+      .hidden { display: none; }
+      .ok { border-color: #4caf50; }
+      .hint { color: #333; background:#fff6d1; padding: 0.5rem; border-radius: 8px; }
+      code { background: #f5f5f5; padding: 0.2rem 0.3rem; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <div class="card" id="card">
+      <h1>Stage 3 — Web Puzzle</h1>
+      <p>Enter the Stage 2 password to reveal the next password.</p>
+      <input id="pw" type="password" placeholder="Stage 2 password" />
+      <button id="go">Unlock</button>
+
+      <div class="hint" id="hint">
+        <strong>Mini-fix:</strong> One of the tags below is broken. Fix the <code>&lt;div&gt;</code> nesting in your devtools (or edit file) to enable the reveal.
+      </div>
+
+      <!-- Intentional minor markup issue to nudge teams into DevTools -->
+      <div id="broken">
+        <div>
+          <div id="result" class="hidden">
+            <h3>Nice work!</h3>
+            <p>The Stage 3 password is: <code id="stage3pw"></code></p>
+            <p>Proceed to Stage 4: <code>../stage4_data/README.md</code></p>
+          </div>
+        </div>
+      <!-- Missing closing </div> here on purpose -->
+
+    </div>
+
+    <script>
+      // Encrypted blob: Base64( ROT13( "DATA-OTTER" ) )
+      const ENC = "UU5HTi1CR0dSRQ==";
+      const EXPECTED_PW = "CITRINE-FOX";
+
+      function rot13(s) {
+        return s.replace(/[a-zA-Z]/g, c => {
+          const base = c <= 'Z' ? 65 : 97;
+          return String.fromCharCode((c.charCodeAt(0) - base + 13) % 26 + base);
+        });
+      }
+
+      document.getElementById('go').addEventListener('click', () => {
+        const val = document.getElementById('pw').value.trim();
+        if (val !== EXPECTED_PW) { alert("Nope — check Stage 2."); return; }
+
+        // If the broken div is not fixed, we can't reveal.
+        const container = document.getElementById('result');
+        if (!container) { alert("The page structure seems broken — fix the nesting as hinted."); return; }
+
+        const decoded = atob(ENC);
+        const secret = rot13(decoded);
+        container.classList.remove('hidden');
+        document.getElementById('stage3pw').textContent = secret;
+        document.getElementById('card').classList.add('ok');
+      });
+    </script>
+  </body>
+</html>
