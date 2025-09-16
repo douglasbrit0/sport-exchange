@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package events.v1;
+
+// Minimal event placeholders; extend later.
+message TradeExecuted {
+  string trade_id = 1;
+  string player_id = 2;
+  double size = 3;
+  double price = 4;
+  string side = 5; // BUY/SELL
+  int64  ts_ms = 6;
+}
+
+message LedgerPosted {
+  string journal_id = 1;
+  int64  ts_ms = 2;
+}
+
+message FairValueUpdated {
+  string player_id = 1;
+  double fair_value = 2;
+  int64  ts_ms = 3;
+}
+
+message PositionSnapshot {
+  string account_id = 1;
+  string player_id  = 2;
+  double position   = 3;
+  double cash       = 4;
+  int64  ts_ms      = 5;
+}

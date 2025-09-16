@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+.venv/
+
+# Go
+bin/
+coverage.out
+
+# Rust
+target/
+
+# General
+.env
+*.log
+.DS_Store
+
+# Docker
+**/.docker-build/

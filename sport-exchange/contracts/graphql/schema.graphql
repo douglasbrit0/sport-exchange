@@ -1,0 +1,74 @@
+enum OrderSide { BUY SELL }
+enum TimeInForce { GTC IOC FOK }
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  health: String!
+  version: String!
+  players(limit: Int = 100, offset: Int = 0): [Player!]!
+  player(id: ID!): Player
+}
+
+type Mutation {
+  _noop: Boolean # placeholder; replace later
+}
+
+type Player {
+  id: ID!
+  name: String!
+  symbol: String!            # e.g., “HAA” for Haaland
+  team: String
+  position: String
+  price: Float!              # latest mid or last price
+  change24h: Float!          # % change (−1.0 to 1.0 == −100%..+100%)
+  volume24h: Float!          # notional or base units
+  marketCap: Float!          # price * circulatingSupply
+  circulatingSupply: Float!  # tradable float
+  totalSupply: Float!        # hard cap for the player token
+  volatility24h: Float!      # realized or model-based
+  sentimentScore: Float      # −1..+1 or 0..1
+  liquidity: Liquidity
+  ohlc24h: OHLC
+  contractAddress: String
+  chain: String
+  decimals: Int
+}
+
+type Liquidity {
+  depthMid: Float            # depth within, say, 1% band
+  depthBest: Float           # depth at top of book
+  spreadBps: Float           # quoted spread in bps
+  ammK: Float                # AMM invariant (if applicable)
+}
+
+type OHLC {
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  timestamp: String!
+}
+
+input OrderInput {
+  playerId: ID!
+  side: OrderSide!
+  size: Float!
+  limitPrice: Float
+  timeInForce: TimeInForce = GTC
+}
+
+type OrderResult {
+  id: ID!
+  status: String!
+  filledSize: Float!
+  avgPrice: Float!
+}
+
+type Mutation {
+  _noop: Boolean
+  placeOrder(order: OrderInput!): OrderResult!
+}

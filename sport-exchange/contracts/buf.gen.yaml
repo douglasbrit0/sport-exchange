@@ -1,0 +1,19 @@
+version: v2
+plugins:
+  # Keep central TS (optional)
+  - remote: buf.build/bufbuild/es
+    out: gen/ts/proto
+    opt:
+      - target=ts
+
+  # NEW: TS directly into the gateway source tree
+  - remote: buf.build/bufbuild/es
+    out: ../gateway/src/__generated__/proto
+    opt:
+      - target=ts
+
+  # Go
+  - remote: buf.build/protocolbuffers/go
+    out: gen/go
+    opt:
+      - paths=source_relative

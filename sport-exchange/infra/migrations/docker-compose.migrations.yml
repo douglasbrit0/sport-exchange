@@ -1,0 +1,11 @@
+services:
+  migrate:
+    image: migrate/migrate:v4.17.1
+    command: ["-path", "/migrations", "-database", "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB?sslmode=disable", "up"]
+    volumes:
+      - ../..:/work
+      - ../..:/migrations:ro
+    working_dir: /work/migrations
+    depends_on:
+      postgres:
+        condition: service_healthy

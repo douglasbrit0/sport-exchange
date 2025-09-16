@@ -1,57 +1,62 @@
-// src/index.ts
-import "dotenv/config";
 import express from "express";
-import cors from "cors";
-import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
-import { readFileSync } from "fs";
-import path from "path";
+import helmet from "helmet";
 import morgan from "morgan";
-import rateLimit from "express-rate-limit";
-import { resolvers } from "./resolvers";
-import type { GraphQLContext } from "./context";
+import cors from "cors";
+import client from "prom-client";
 
-// IMPORTANT: schema is in ../contracts from the gateway folder
-const schemaPath = path.resolve(process.cwd(), "../contracts/graphql/schema.graphql");
-const typeDefs = readFileSync(schemaPath, "utf8");
+import { makeQuoteHandler } from "./routes/quote.js";
+import { PriceSvcClient } from "./clients/priceSvc.js";
 
-const server = new ApolloServer<GraphQLContext>({ typeDefs, resolvers });
+const app = express();
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(morgan("dev"));
 
-async function main() {
-  const app = express();
-  app.use(cors());
-  app.use(express.json());
-  app.use(morgan("tiny"));
-  app.use(rateLimit({ windowMs: 60_000, max: 600 }));
+const PORT = Number(process.env.PORT ?? 4000);
+const PRICE_SVC_URL = process.env.PRICE_SVC_URL ?? "http://price-svc:8000";
+const GRAPHQL_ENABLED = process.env.GRAPHQL_ENABLED === "true";
 
-  await server.start();
+const priceClient = new PriceSvcClient({ baseUrl: PRICE_SVC_URL });
 
-  app.get("/healthz", (_req, res) => res.status(200).send("ok"));
+/** ── Prometheus metrics ─────────────────────────────────────────────── */
+client.collectDefaultMetrics(); // process + runtime
 
-  // Tiny debug endpoint to confirm wiring at runtime
-  app.get("/_debug", (_req, res) => {
-    res.json({
-      schemaPath,
-      queryResolvers: Object.keys((resolvers as any).Query || {}),
-    });
-  });
+// duration histogram with method/path/status
+const httpDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "HTTP request duration in seconds",
+  labelNames: ["method", "path", "status"] as const,
+  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5],
+});
 
-  app.use(
-    "/graphql",
-    expressMiddleware(server, {
-      context: async () => ({ requestId: crypto.randomUUID?.() }),
-    })
-  );
+// timing middleware
+app.use((req, res, next) => {
+  const end = httpDuration.startTimer({ method: req.method, path: req.path });
+  res.on("finish", () => end({ status: String(res.statusCode) }));
+  next();
+});
 
-  const PORT = Number(process.env.PORT ?? 4000);
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`gateway listening on http://0.0.0.0:${PORT}`);
-    console.log(`SDL: ${schemaPath}`);
-    console.log(`Query resolvers: ${Object.keys((resolvers as any).Query || {}).join(", ")}`);
-  });
+// /metrics endpoint
+app.get("/metrics", async (_req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
+});
+/** ───────────────────────────────────────────────────────────────────── */
+
+/** REST */
+app.get("/api/quote", makeQuoteHandler(priceClient));
+app.get("/healthz", (_req, res) => res.type("text/plain").send("ok"));
+
+async function start() {
+  if (GRAPHQL_ENABLED) {
+    const mod = await (eval("import")("./graphql.js") as Promise<any>);
+    await mod.registerGraphQL(app, priceClient);
+    console.log("GraphQL enabled at /graphql");
+  }
+  app.listen(PORT, "0.0.0.0", () => console.log(`gateway listening on :${PORT}`));
 }
-
-main().catch((e) => {
-  console.error("fatal startup error:", e);
+start().catch((err) => {
+  console.error("Fatal startup error:", err);
   process.exit(1);
 });

@@ -2,13 +2,13 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "../contracts/graphql/schema.graphql", // <-- fix
+  schema: "../contracts/graphql/**/*.graphql",
   generates: {
     "src/__generated__/types.ts": {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
         contextType: "../context#GraphQLContext",
-        avoidOptionals: true,
+        avoidOptionals: false,
         enumsAsTypes: true,
         useTypeImports: true,
         makeResolverTypeCallable: true,

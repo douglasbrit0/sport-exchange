@@ -1,0 +1,5 @@
+{
+    "python.defaultInterpreterPath": "/Users/douglas/sport-exchange/.venv/bin/python",
+    "python.analysis.extraPaths": ["backend"]
+  }
+  

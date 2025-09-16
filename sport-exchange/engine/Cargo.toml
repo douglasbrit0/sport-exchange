@@ -1,0 +1,27 @@
+[package]
+name = "engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.39", features = ["rt-multi-thread", "macros"] }
+axum = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+nats = "0.24"
+anyhow = "1.0"
+chrono = "0.4"
+
+# gRPC / protobuf
+tonic = { version = "0.11", features = ["transport"] }
+prost = "0.12"
+prost-types = "0.12"        # <-- needed for google.protobuf.Timestamp
+
+# utils
+anyhow = "1"                # <-- you use anyhow::Result
+async-trait = "0.1"         # <-- you use #[async_trait::async_trait]
+
+[build-dependencies]
+tonic-build = "0.11"
+walkdir = "2"

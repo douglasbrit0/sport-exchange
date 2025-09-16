@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package engine.v1;
+
+// (Go path hint if you care later)
+// option go_package = "github.com/yourorg/sport-exchange/gen/go/engine/v1;enginev1";
+
+message QuoteRequest { string player_id = 1; }
+message QuoteResponse { double bid = 1; double ask = 2; }
+
+service Engine {
+  rpc Quote(QuoteRequest) returns (QuoteResponse);
+}

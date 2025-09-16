@@ -1,0 +1,47 @@
+/*
+syntax = "proto3";
+package engine.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message QuoteRequest { string symbol = 1; }
+
+message QuoteResponse {
+  double bid = 1;
+  double ask = 2;
+  google.protobuf.Timestamp ts = 3;
+}
+
+service Quotes {
+  rpc GetQuote(QuoteRequest) returns (QuoteResponse);
+}
+*/
+
+syntax = "proto3";
+package engine.v1;
+
+
+option go_package = "github.com/douglasbrit0/sport-exchange/contracts/gen/go/engine/v1;enginev1";
+option java_package = "com.yourorg.sportexchange.engine.v1";
+
+
+message QuoteRequest {
+string player_id = 1;
+string market = 2; // e.g., "EPL"
+string req_id = 3; // correlation id
+}
+
+
+message QuoteResponse {
+string player_id = 1;
+double bid = 2;
+double ask = 3;
+double mid = 4;
+int64 ts_ms = 5;
+string req_id = 6; // mirrors request
+}
+
+
+// NATS subjects (documentary; subjects enforced by app config)
+// request: engine.v1.quote.request
+// response: engine.v1.quote.response (optional if using NATS request/reply)

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/graphql.ts",
+    "src/__generated__/types.ts",
+    "src/resolvers.ts",
+    "src/mappers/player.ts"
+  ]
+}

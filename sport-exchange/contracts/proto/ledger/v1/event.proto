@@ -1,0 +1,11 @@
+syntax = "proto3";
+package ledger.v1;
+
+message LedgerEntry {
+  string id         = 1; // uuid
+  string event_type = 2; // e.g. "ORDER_PLACED"
+  string ref_id     = 3; // correlation id
+  bytes  payload    = 4; // serialized sub-message (Json/Proto)
+  int64  ts_ms      = 5; // epoch ms
+}
+option go_package = "github.com/douglasbrit0/sport-exchange/contracts/gen/go/ledger/v1;ledgerv1";

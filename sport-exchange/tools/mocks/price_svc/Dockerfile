@@ -1,0 +1,14 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci || npm i
+COPY . .
+EXPOSE 8000
+CMD ["npm","start"]
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci || npm i
+COPY . .
+EXPOSE 8000
+CMD ["npm","start"]

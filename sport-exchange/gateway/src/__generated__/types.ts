@@ -19,15 +19,21 @@ export type Scalars = {
 
 export type Liquidity = {
   __typename?: 'Liquidity';
-  ammK: Maybe<Scalars['Float']['output']>;
-  depthBest: Maybe<Scalars['Float']['output']>;
-  depthMid: Maybe<Scalars['Float']['output']>;
-  spreadBps: Maybe<Scalars['Float']['output']>;
+  ammK?: Maybe<Scalars['Float']['output']>;
+  depthBest?: Maybe<Scalars['Float']['output']>;
+  depthMid?: Maybe<Scalars['Float']['output']>;
+  spreadBps?: Maybe<Scalars['Float']['output']>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  _noop: Maybe<Scalars['Boolean']['output']>;
+  _noop?: Maybe<Scalars['Boolean']['output']>;
+  placeOrder: OrderResult;
+};
+
+
+export type MutationPlaceOrderArgs = {
+  order: OrderInput;
 };
 
 export type Ohlc = {
@@ -39,23 +45,43 @@ export type Ohlc = {
   timestamp: Scalars['String']['output'];
 };
 
+export type OrderInput = {
+  limitPrice?: InputMaybe<Scalars['Float']['input']>;
+  playerId: Scalars['ID']['input'];
+  side: OrderSide;
+  size: Scalars['Float']['input'];
+  timeInForce?: InputMaybe<TimeInForce>;
+};
+
+export type OrderResult = {
+  __typename?: 'OrderResult';
+  avgPrice: Scalars['Float']['output'];
+  filledSize: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  status: Scalars['String']['output'];
+};
+
+export type OrderSide =
+  | 'BUY'
+  | 'SELL';
+
 export type Player = {
   __typename?: 'Player';
-  chain: Maybe<Scalars['String']['output']>;
+  chain?: Maybe<Scalars['String']['output']>;
   change24h: Scalars['Float']['output'];
   circulatingSupply: Scalars['Float']['output'];
-  contractAddress: Maybe<Scalars['String']['output']>;
-  decimals: Maybe<Scalars['Int']['output']>;
+  contractAddress?: Maybe<Scalars['String']['output']>;
+  decimals?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
-  liquidity: Maybe<Liquidity>;
+  liquidity?: Maybe<Liquidity>;
   marketCap: Scalars['Float']['output'];
   name: Scalars['String']['output'];
-  ohlc24h: Maybe<Ohlc>;
-  position: Maybe<Scalars['String']['output']>;
+  ohlc24h?: Maybe<Ohlc>;
+  position?: Maybe<Scalars['String']['output']>;
   price: Scalars['Float']['output'];
-  sentimentScore: Maybe<Scalars['Float']['output']>;
+  sentimentScore?: Maybe<Scalars['Float']['output']>;
   symbol: Scalars['String']['output'];
-  team: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Scalars['String']['output']>;
   totalSupply: Scalars['Float']['output'];
   volatility24h: Scalars['Float']['output'];
   volume24h: Scalars['Float']['output'];
@@ -64,7 +90,7 @@ export type Player = {
 export type Query = {
   __typename?: 'Query';
   health: Scalars['String']['output'];
-  player: Maybe<Player>;
+  player?: Maybe<Player>;
   players: Array<Player>;
   version: Scalars['String']['output'];
 };
@@ -79,6 +105,11 @@ export type QueryPlayersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
+
+export type TimeInForce =
+  | 'FOK'
+  | 'GTC'
+  | 'IOC';
 
 
 
@@ -154,9 +185,13 @@ export type ResolversTypes = {
   Liquidity: ResolverTypeWrapper<Liquidity>;
   Mutation: ResolverTypeWrapper<{}>;
   OHLC: ResolverTypeWrapper<Ohlc>;
+  OrderInput: OrderInput;
+  OrderResult: ResolverTypeWrapper<OrderResult>;
+  OrderSide: OrderSide;
   Player: ResolverTypeWrapper<Player>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  TimeInForce: TimeInForce;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -168,66 +203,78 @@ export type ResolversParentTypes = {
   Liquidity: Liquidity;
   Mutation: {};
   OHLC: Ohlc;
+  OrderInput: OrderInput;
+  OrderResult: OrderResult;
   Player: Player;
   Query: {};
   String: Scalars['String']['output'];
 };
 
 export type LiquidityResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Liquidity'] = ResolversParentTypes['Liquidity']> = {
-  ammK: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  depthBest: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  depthMid: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  spreadBps: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  ammK?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  depthBest?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  depthMid?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  spreadBps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  _noop: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  _noop?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  placeOrder?: Resolver<ResolversTypes['OrderResult'], ParentType, ContextType, RequireFields<MutationPlaceOrderArgs, 'order'>>;
 };
 
 export type OhlcResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OHLC'] = ResolversParentTypes['OHLC']> = {
-  close: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  high: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  low: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  open: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  timestamp: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  close?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  high?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  low?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  open?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  timestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type OrderResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrderResult'] = ResolversParentTypes['OrderResult']> = {
+  avgPrice?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  filledSize?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type PlayerResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Player'] = ResolversParentTypes['Player']> = {
-  chain: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  change24h: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  circulatingSupply: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  contractAddress: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  decimals: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  liquidity: Resolver<Maybe<ResolversTypes['Liquidity']>, ParentType, ContextType>;
-  marketCap: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  ohlc24h: Resolver<Maybe<ResolversTypes['OHLC']>, ParentType, ContextType>;
-  position: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  price: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  sentimentScore: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  symbol: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  team: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  totalSupply: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  volatility24h: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  volume24h: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  chain?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  change24h?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  circulatingSupply?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  contractAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  decimals?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  liquidity?: Resolver<Maybe<ResolversTypes['Liquidity']>, ParentType, ContextType>;
+  marketCap?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  ohlc24h?: Resolver<Maybe<ResolversTypes['OHLC']>, ParentType, ContextType>;
+  position?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  sentimentScore?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  symbol?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  team?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  totalSupply?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  volatility24h?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  volume24h?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  health: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  player: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType, RequireFields<QueryPlayerArgs, 'id'>>;
-  players: Resolver<Array<ResolversTypes['Player']>, ParentType, ContextType, RequireFields<QueryPlayersArgs, 'limit' | 'offset'>>;
-  version: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  health?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  player?: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType, RequireFields<QueryPlayerArgs, 'id'>>;
+  players?: Resolver<Array<ResolversTypes['Player']>, ParentType, ContextType, RequireFields<QueryPlayersArgs, 'limit' | 'offset'>>;
+  version?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = GraphQLContext> = {
-  Liquidity: LiquidityResolvers<ContextType>;
-  Mutation: MutationResolvers<ContextType>;
-  OHLC: OhlcResolvers<ContextType>;
-  Player: PlayerResolvers<ContextType>;
-  Query: QueryResolvers<ContextType>;
+  Liquidity?: LiquidityResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
+  OHLC?: OhlcResolvers<ContextType>;
+  OrderResult?: OrderResultResolvers<ContextType>;
+  Player?: PlayerResolvers<ContextType>;
+  Query?: QueryResolvers<ContextType>;
 };
 

@@ -1,0 +1,9 @@
+version: v2
+modules:
+  - path: proto
+    excludes:
+      - proto/_legacy
+lint:
+  use: [STANDARD]
+breaking:
+  use: [FILE]
